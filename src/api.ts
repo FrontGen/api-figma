@@ -1,57 +1,51 @@
-import axios from "axios";
 import { toQueryParams } from "./utils";
 import { Api } from "./api-types";
 import { API_DOMAIN, API_VER } from "./config";
 
 export const createApi = (
-  params:
-    | { personalAccessToken: string; oAuthToken?: never }
-    | { personalAccessToken?: never; oAuthToken: string },
+  params: { personalAccessToken: string } | { oAuthToken: string },
 ): Api => {
-  const headers = {
-    "X-Figma-Token": params.personalAccessToken,
-    Authorization: params.oAuthToken ? `Bearer ${params.oAuthToken}` : "",
-  };
+  const headers: Record<string, string> =
+    "oAuthToken" in params
+      ? { Authorization: `Bearer ${params.oAuthToken}` }
+      : { "X-Figma-Token": params.personalAccessToken };
 
-  const api = axios.create({
-    headers,
-    baseURL: `${API_DOMAIN}/${API_VER}/`,
-    paramsSerializer: (params) => toQueryParams(params),
-  });
-  api.interceptors.response.use((res) => res.data);
+  const api = (url: string, request?: RequestInit & { params?: unknown }) =>
+    fetch(`${API_DOMAIN}/${API_VER}/` + url + toQueryParams(request?.params), {
+      headers: { ...request?.headers, ...headers },
+      ...request,
+    }).then((res) => res.json());
 
   return {
-    getUserMe: () => api.get(`me`),
-    getStyle: (key) => api.get(`styles/${key}`),
-    getImageFills: (fileKey) => api.get(`files/${fileKey}/images`),
-    getComments: (fileKey) => api.get(`files/${fileKey}/comments`),
-    getVersions: (fileKey) => api.get(`files/${fileKey}/versions`),
-    getTeamProjects: (teamId) => api.get(`teams/${teamId}/projects`),
-    getComponent: (key) => api.get(`components/${key}`),
-    getComponentSet: (key) => api.get(`component_sets/${key}`),
-    getFileComponents: (fileKey) => api.get(`files/${fileKey}/components`),
-    getFileStyles: (file_key) => api.get(`files/${file_key}/styles`),
-    getFile: ({ fileKey, ...params }) =>
-      api.get(`files/${fileKey}`, { params }),
+    getUserMe: () => api(`me`),
+    getStyle: (key) => api(`styles/${key}`),
+    getImageFills: (fileKey) => api(`files/${fileKey}/images`),
+    getComments: (fileKey) => api(`files/${fileKey}/comments`),
+    getVersions: (fileKey) => api(`files/${fileKey}/versions`),
+    getTeamProjects: (teamId) => api(`teams/${teamId}/projects`),
+    getComponent: (key) => api(`components/${key}`),
+    getComponentSet: (key) => api(`component_sets/${key}`),
+    getFileComponents: (fileKey) => api(`files/${fileKey}/components`),
+    getFileStyles: (file_key) => api(`files/${file_key}/styles`),
+    getFile: ({ fileKey, ...params }) => api(`files/${fileKey}`, { params }),
     getFileNodes: ({ fileKey, ...params }) =>
-      api.get(`files/${fileKey}/nodes`, { params }),
-    getImage: ({ fileKey, ...params }) =>
-      api.get(`images/${fileKey}`, { params }),
+      api(`files/${fileKey}/nodes`, { params }),
+    getImage: ({ fileKey, ...params }) => api(`images/${fileKey}`, { params }),
     getProjectFiles: ({ project_id, ...params }) =>
-      api.get(`projects/${project_id}/files`, { params }),
+      api(`projects/${project_id}/files`, { params }),
     getTeamComponents: ({ team_id, ...params }) =>
-      api.get(`teams/${team_id}/components`, { params }),
+      api(`teams/${team_id}/components`, { params }),
     getTeamComponentSets: ({ team_id, ...params }) =>
-      api.get(`teams/${team_id}/component_sets`, { params }),
-    getFileComponentSets: (file_key) =>
-      api.get(`files/${file_key}/component_sets`),
+      api(`teams/${team_id}/component_sets`, { params }),
+    getFileComponentSets: (file_key) => api(`files/${file_key}/component_sets`),
     getTeamStyles: ({ team_id, ...params }) =>
-      api.get(`teams/${team_id}/styles`, { params }),
+      api(`teams/${team_id}/styles`, { params }),
     deleteComments: ({ fileKey, commentId }) =>
-      api.delete(`files/${fileKey}/comments/${commentId}`, { data: "" }),
-    postComments: ({ fileKey, ...data }) =>
-      api.post(`files/${fileKey}/comments`, {
-        data,
+      api(`files/${fileKey}/comments/${commentId}`, { method: "DELETE" }),
+    postComments: ({ fileKey, ...body }) =>
+      api(`files/${fileKey}/comments`, {
+        body: JSON.stringify(body),
+        method: "POST",
         headers: { "Content-Type": "application/json" },
       }),
   };
@@ -85,14 +79,14 @@ export const oAuthToken = (
   refresh_token: string;
   expires_in: number;
 }> =>
-  axios({
-    url: `https://www.figma.com/api/oauth/token`,
-    method: "POST",
-    params: {
-      client_id,
-      client_secret,
-      redirect_uri,
-      code,
-      grant_type,
-    },
-  }).then((res) => res.data);
+  fetch(
+    `https://www.figma.com/api/oauth/token` +
+      toQueryParams({
+        client_id,
+        client_secret,
+        redirect_uri,
+        code,
+        grant_type,
+      }),
+    { method: "POST" },
+  ).then((res) => res.json());

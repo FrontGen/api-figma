@@ -765,7 +765,7 @@ export interface LayoutMixin {
   /** The bounds of the rendered node in the file in absolute space coordinates */
   absoluteRenderBounds: Rectangle;
   /** Width and height of element. This is different from the width and height of the bounding box in that the absolute bounding box represents the element after scaling and rotation. Only present if geometry=paths is passed */
-  size: Vector;
+  size?: Vector;
 }
 
 /** A node of fixed size containing other nodes */
