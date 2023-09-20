@@ -220,6 +220,16 @@ export interface GetFileNodesParams {
   plugin_data?: string;
 }
 
+export interface FileNode {
+  document: Node;
+  components: { [nodeId: string]: Component };
+  componentSets: {
+    [nodeId: string]: ComponentSet;
+  };
+  schemaVersion: number;
+  styles: { [styleName: string]: Style };
+}
+
 /** The `name`, `lastModified`, `thumbnailUrl`, and `version` attributes are all metadata of the specified file. */
 export interface GetFileNodesResult {
   name: string;
@@ -228,15 +238,7 @@ export interface GetFileNodesResult {
   version: string;
   err?: string;
   nodes: {
-    [nodeId: string]: {
-      document: Node;
-      components: { [nodeId: string]: Component };
-      componentSets: {
-        [nodeId: string]: ComponentSet;
-      };
-      schemaVersion: number;
-      styles: { [styleName: string]: Style };
-    } | null;
+    [nodeId: string]: FileNode | null;
   };
 }
 

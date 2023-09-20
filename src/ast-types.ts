@@ -568,7 +568,7 @@ export type TypeStyle = {
   lineHeightUnit: LineHeightUnit;
 };
 
-export type StyleType = "FILL" | "TEXT" | "EFFECT" | "GRID";
+export type StyleType = "fill" | "text" | "effect" | "grid";
 
 /** Data on the frame a component resides in */
 export interface FrameInfo {
