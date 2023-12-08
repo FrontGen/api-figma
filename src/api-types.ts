@@ -164,13 +164,6 @@ export interface StyleMetadata {
 // -----------------------------------------------------------------
 
 export interface GetFileParams {
-  /**
-   * File to export JSON from
-   *
-   * Can be found in url to file, eg:
-   * https://www.figma.com/file/FILE_KEY/FILE_NAME
-   */
-  fileKey: string;
   /** A specific version ID to get. Omitting this will get the current version of the file */
   version?: string;
   /** If specified, only a subset of the document will be returned corresponding to the nodes listed, their children, and everything between the root node and the listed nodes */
@@ -243,7 +236,6 @@ export interface GetFileNodesResult {
 }
 
 export interface GetImageParams {
-  fileKey: string;
   /** list of node IDs to render */
   ids: string[];
   /** A number between 0.01 and 4, the image scaling factor */
@@ -281,7 +273,6 @@ export interface GetCommentsResult {
 }
 
 export interface PostCommentParams {
-  fileKey: string;
   /** The text contents of the comment to post */
   message: string;
   /** The position of where to place the comment. This can either be an absolute canvas position or the relative position within a frame. */
@@ -294,7 +285,6 @@ export interface PostCommentParams {
 export interface PostCommentResult extends Comment {}
 
 export interface DeleteCommentsParams {
-  fileKey: string;
   commentId: string;
 }
 
@@ -437,10 +427,10 @@ export type Api = {
   getFile(params: GetFileParams): Promise<GetFileResult>;
   getFileNodes(params: GetFileNodesParams): Promise<GetFileNodesResult>;
   getImage(params: GetImageParams): Promise<GetImageResult>;
-  getImageFills(fileKey: string): Promise<GetImageFillsResult>;
+  getImageFills(): Promise<GetImageFillsResult>;
   // COMMENTS
   // -----------------------------------------------------------------
-  getComments(fileKey: string): Promise<GetCommentsResult>;
+  getComments(): Promise<GetCommentsResult>;
   postComments(params: PostCommentParams): Promise<PostCommentResult>;
   deleteComments(params: DeleteCommentsParams): Promise<DeleteCommentsResult>;
   // USERS
@@ -448,7 +438,7 @@ export type Api = {
   getUserMe(): Promise<GetUserMeResult>;
   // VERSION HISTORY
   // -----------------------------------------------------------------
-  getVersions(fileKey: string): Promise<GetVersionsResult>;
+  getVersions(): Promise<GetVersionsResult>;
   // PROJECTS
   // -----------------------------------------------------------------
   getTeamProjects(teamId: string): Promise<GetTeamProjectsResult>;
@@ -461,13 +451,13 @@ export type Api = {
   getTeamComponents(
     params: GetTeamComponentsParams,
   ): Promise<GetTeamComponentsResult>;
-  getFileComponents(fileKey: string): Promise<GetFileComponentsResult>;
+  getFileComponents(): Promise<GetFileComponentsResult>;
   /** Get metadata on a component by key. The unique identifier of the component.*/
   getComponent(key: string): Promise<GetComponentResult>;
   getTeamComponentSets(
     params: GetTeamComponentSetsParams,
   ): Promise<GetTeamComponentSetsResult>;
-  getFileComponentSets(fileKey: string): Promise<GetFileComponentSetsResult>;
+  getFileComponentSets(): Promise<GetFileComponentSetsResult>;
   /** Key is unique identifier of the component_set */
   getComponentSet(key: string): Promise<GetComponentSetResult>;
   getTeamStyles(params: GetTeamStylesParams): Promise<GetTeamStylesResult>;
