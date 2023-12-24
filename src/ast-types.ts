@@ -807,9 +807,9 @@ export interface FRAME extends StrokesMixin, LayoutMixin {
   /** default: NO_WRAP Whether this auto-layout frame has wrapping enabled. */
   layoutWrap: "NO_WRAP" | "WRAP";
   /** Whether the primary axis has a fixed length (determined by the user) or an automatic length (determined by the layout engine). This property is only applicable for auto-layout frames. Default AUTO */
-  primaryAxisSizingMode: AxisSizingMode;
+  primaryAxisSizingMode?: AxisSizingMode;
   /** Whether the counter axis has a fixed length (determined by the user) or an automatic length (determined by the layout engine). This property is only applicable for auto-layout frames. Default AUTO */
-  counterAxisSizingMode: AxisSizingMode;
+  counterAxisSizingMode?: AxisSizingMode;
   /** default: AUTO Determines how the auto-layout frame’s wrapped tracks should be aligned in the counter axis direction. This property is only applicable for auto-layout frames withlayoutWrap: "WRAP". */
   counterAxisAlignContent: "AUTO" | "SPACE_BETWEEN";
   /** Determines how the auto-layout frame’s children should be aligned in the primary axis direction. This property is only applicable for auto-layout frames. Default MIN */

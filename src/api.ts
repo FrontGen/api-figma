@@ -3,11 +3,8 @@ import { Api } from "./api-types";
 import { API_DOMAIN, API_VER } from "./config";
 
 export const createApi = (
-  params: ({ personalAccessToken: string } | { oAuthToken: string }) & {
-    fileKey: string;
-  },
+  params: { personalAccessToken: string } | { oAuthToken: string },
 ): Api => {
-  const fileKey = params.fileKey;
   const headers: Record<string, string> =
     "oAuthToken" in params
       ? { Authorization: `Bearer ${params.oAuthToken}` }
@@ -17,34 +14,35 @@ export const createApi = (
     fetch(`${API_DOMAIN}/${API_VER}/` + url + toQueryParams(request?.params), {
       headers: { ...request?.headers, ...headers },
       ...request,
-    }).then((res) => res.json());
+    }).then((res) => res.json() as never);
 
   return {
     getUserMe: () => api(`me`),
     getStyle: (key) => api(`styles/${key}`),
-    getImageFills: () => api(`files/${fileKey}/images`),
-    getComments: () => api(`files/${fileKey}/comments`),
-    getVersions: () => api(`files/${fileKey}/versions`),
+    getImageFills: (fileKey) => api(`files/${fileKey}/images`),
+    getComments: (fileKey) => api(`files/${fileKey}/comments`),
+    getVersions: (fileKey) => api(`files/${fileKey}/versions`),
     getTeamProjects: (teamId) => api(`teams/${teamId}/projects`),
     getComponent: (key) => api(`components/${key}`),
     getComponentSet: (key) => api(`component_sets/${key}`),
-    getFileComponents: () => api(`files/${fileKey}/components`),
+    getFileComponents: (fileKey) => api(`files/${fileKey}/components`),
     getFileStyles: (file_key) => api(`files/${file_key}/styles`),
-    getFile: (params) => api(`files/${fileKey}`, { params }),
-    getFileNodes: (params) => api(`files/${fileKey}/nodes`, { params }),
-    getImage: (params) => api(`images/${fileKey}`, { params }),
+    getFile: ({ fileKey, ...params }) => api(`files/${fileKey}`, { params }),
+    getFileNodes: ({ fileKey, ...params }) =>
+      api(`files/${fileKey}/nodes`, { params }),
+    getImage: ({ fileKey, ...params }) => api(`images/${fileKey}`, { params }),
     getProjectFiles: ({ project_id, ...params }) =>
       api(`projects/${project_id}/files`, { params }),
     getTeamComponents: ({ team_id, ...params }) =>
       api(`teams/${team_id}/components`, { params }),
     getTeamComponentSets: ({ team_id, ...params }) =>
       api(`teams/${team_id}/component_sets`, { params }),
-    getFileComponentSets: () => api(`files/${fileKey}/component_sets`),
+    getFileComponentSets: (file_key) => api(`files/${file_key}/component_sets`),
     getTeamStyles: ({ team_id, ...params }) =>
       api(`teams/${team_id}/styles`, { params }),
-    deleteComments: ({ commentId }) =>
+    deleteComments: ({ fileKey, commentId }) =>
       api(`files/${fileKey}/comments/${commentId}`, { method: "DELETE" }),
-    postComments: (body) =>
+    postComments: ({ fileKey, ...body }) =>
       api(`files/${fileKey}/comments`, {
         body: JSON.stringify(body),
         method: "POST",
@@ -91,4 +89,4 @@ export const oAuthToken = (
         grant_type,
       }),
     { method: "POST" },
-  ).then((res) => res.json());
+  ).then((res) => res.json() as never);
