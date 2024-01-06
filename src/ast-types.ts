@@ -566,6 +566,10 @@ export type TypeStyle = {
   lineHeightPercentFontSize?: number;
   /** The unit of the line height value specified by the user. */
   lineHeightUnit: LineHeightUnit;
+  /** When textTruncation: "ENDING" is set, maxLines determines how many lines a text node can grow to before it truncates. */
+  maxLines?: number;
+  /** Whether this text node will truncate with an ellipsis when the text contents is larger than the text node. */
+  textTruncation?: "DISABLED" | "ENDING";
 };
 
 export type StyleType = "fill" | "text" | "effect" | "grid";
@@ -803,7 +807,7 @@ export interface FRAME extends StrokesMixin, LayoutMixin {
   /** Does this node clip content outside of its bounds? */
   clipsContent: boolean;
   /** Whether this layer uses auto-layout to position its children. default NONE */
-  layoutMode: "NONE" | "HORIZONTAL" | "VERTICAL";
+  layoutMode?: "NONE" | "HORIZONTAL" | "VERTICAL";
   /** default: NO_WRAP Whether this auto-layout frame has wrapping enabled. */
   layoutWrap: "NO_WRAP" | "WRAP";
   /** Whether the primary axis has a fixed length (determined by the user) or an automatic length (determined by the layout engine). This property is only applicable for auto-layout frames. Default AUTO */
@@ -813,9 +817,9 @@ export interface FRAME extends StrokesMixin, LayoutMixin {
   /** default: AUTO Determines how the auto-layout frame’s wrapped tracks should be aligned in the counter axis direction. This property is only applicable for auto-layout frames withlayoutWrap: "WRAP". */
   counterAxisAlignContent: "AUTO" | "SPACE_BETWEEN";
   /** Determines how the auto-layout frame’s children should be aligned in the primary axis direction. This property is only applicable for auto-layout frames. Default MIN */
-  primaryAxisAlignItems: "MIN" | "CENTER" | "MAX" | "SPACE_BETWEEN";
+  primaryAxisAlignItems?: "MIN" | "CENTER" | "MAX" | "SPACE_BETWEEN";
   /** Determines how the auto-layout frame’s children should be aligned in the counter axis direction. This property is only applicable for auto-layout frames. Default MIN */
-  counterAxisAlignItems: "MIN" | "CENTER" | "MAX" | "BASELINE";
+  counterAxisAlignItems?: "MIN" | "CENTER" | "MAX" | "BASELINE";
   /** default: 0. The padding between the left border of the frame and its children. This property is only applicable for auto-layout frames. */
   paddingLeft: number;
   /** default: 0. The padding between the right border of the frame and its children. This property is only applicable for auto-layout frames. */
