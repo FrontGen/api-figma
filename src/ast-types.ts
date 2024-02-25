@@ -349,6 +349,8 @@ export type EffectShadow = {
 
   /** How far the shadow spreads */
   spread: number;
+  name: string;
+  colorScheme: string;
 } & Effect_;
 
 export type EffectBlur = {
