@@ -32,7 +32,23 @@ export const createApi = (
     getFileStyles: (file_key) => api(`files/${file_key}/styles`),
     getFile: (params) => api(`files/${fileKey}`, { params }),
     getFileNodes: (params) => api(`files/${fileKey}/nodes`, { params }),
-    getImage: (params) => api(`images/${fileKey}`, { params }),
+    getImage: (params) => {
+      const ids = [...params.ids];
+      const idsArray = [];
+      while (ids.length > 0) {
+        idsArray.push(ids.splice(0, 50));
+      }
+      const images =  Promise.all(
+        idsArray.map((ids) =>
+          api(`images/${fileKey}`, { params: { ...params, ids } }),
+        ),
+      );
+
+      return images.then((res) => {
+        const images = res.map((el) => el.images);
+        return images.reduce((acc, el) => ({ ...acc, ...el, images: {...acc.images, ...el.images} }), {});
+      });
+    },
     getProjectFiles: ({ project_id, ...params }) =>
       api(`projects/${project_id}/files`, { params }),
     getTeamComponents: ({ team_id, ...params }) =>
