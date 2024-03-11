@@ -45,8 +45,8 @@ export const createApi = (
       );
 
       return images.then((res) => {
-        const images = res.map((el) => el.images);
-        return images.reduce((acc, el) => ({ ...acc, ...el, images: {...acc.images, ...el.images} }), {});
+        const images = res.map((el) => el.images).reduce((acc, el) => ({ ...acc, ...el }), {});
+        return {images};
       });
     },
     getProjectFiles: ({ project_id, ...params }) =>
