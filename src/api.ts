@@ -1,5 +1,5 @@
 import { toQueryParams } from "./utils";
-import { Api } from "./api-types";
+import type { Api } from "./api-types";
 import { API_DOMAIN, API_VER } from "./config";
 
 export const createApi = (
@@ -14,7 +14,14 @@ export const createApi = (
     fetch(`${API_DOMAIN}/${API_VER}/` + url + toQueryParams(request?.params), {
       headers: { ...request?.headers, ...headers },
       ...request,
-    }).then((res) => res.json() as never);
+    }).then((res) => {
+      const answer = res.json() as never;
+      if (res.ok) {
+        return answer;
+      } else {
+        throw new Error(answer);
+      }
+    });
 
   return {
     getUserMe: () => api(`me`),
