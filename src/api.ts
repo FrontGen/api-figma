@@ -1,45 +1,84 @@
 import { toQueryParams } from "./utils";
-import type { Api } from "./api-types";
 import { API_DOMAIN, API_VER } from "./config";
+import type {
+  DeleteCommentsParams,
+  DeleteCommentsResult,
+  GetCommentsResult,
+  GetComponentResult,
+  GetComponentSetResult,
+  GetFileComponentSetsResult,
+  GetFileComponentsResult,
+  GetFileNodesParams,
+  GetFileNodesResult,
+  GetFileParams,
+  GetFileResult,
+  GetFileStylesResult,
+  GetImageFillsResult,
+  GetImageParams,
+  GetImageResult,
+  GetProjectFilesParams,
+  GetProjectFilesResult,
+  GetStyleResult,
+  GetTeamComponentSetsParams,
+  GetTeamComponentSetsResult,
+  GetTeamComponentsParams,
+  GetTeamComponentsResult,
+  GetTeamProjectsResult,
+  GetTeamStylesParams,
+  GetTeamStylesResult,
+  GetUserMeResult,
+  GetVersionsResult,
+  PostCommentParams,
+  PostCommentResult,
+} from "./api-types.ts";
 
 export const createApi = (
   params: ({ personalAccessToken: string } | { oAuthToken: string }) & {
     fileKey: string;
   },
-): Api => {
+) => {
   const fileKey = params.fileKey;
   const headers: Record<string, string> =
     "oAuthToken" in params
       ? { Authorization: `Bearer ${params.oAuthToken}` }
       : { "X-Figma-Token": params.personalAccessToken };
 
-  const api = (url: string, request?: RequestInit & { params?: unknown }) =>
+  const api = <T>(
+    url: string,
+    request?: RequestInit & { params?: unknown },
+  ): Promise<T> =>
     fetch(`${API_DOMAIN}/${API_VER}/` + url + toQueryParams(request?.params), {
       headers: { ...request?.headers, ...headers },
       ...request,
-    }).then((res) => {
-      const answer = res.json() as never;
+    }).then(async (res) => {
+      const answer = res.json();
       if (res.ok) {
         return answer;
       } else {
-        throw new Error(answer);
+        throw new Error(await res.text());
       }
     });
 
   return {
-    getUserMe: () => api(`me`),
-    getStyle: (key) => api(`styles/${key}`),
-    getImageFills: () => api(`files/${fileKey}/images`),
-    getComments: () => api(`files/${fileKey}/comments`),
-    getVersions: () => api(`files/${fileKey}/versions`),
-    getTeamProjects: (teamId) => api(`teams/${teamId}/projects`),
-    getComponent: (key) => api(`components/${key}`),
-    getComponentSet: (key) => api(`component_sets/${key}`),
-    getFileComponents: () => api(`files/${fileKey}/components`),
-    getFileStyles: (file_key) => api(`files/${file_key}/styles`),
-    getFile: (params) => api(`files/${fileKey}`, { params }),
-    getFileNodes: (params) => api(`files/${fileKey}/nodes`, { params }),
-    getImage: (params) => {
+    getUserMe: () => api<GetUserMeResult>(`me`),
+    getStyle: (key: string) => api<GetStyleResult>(`styles/${key}`),
+    getImageFills: () => api<GetImageFillsResult>(`files/${fileKey}/images`),
+    getComments: () => api<GetCommentsResult>(`files/${fileKey}/comments`),
+    getVersions: () => api<GetVersionsResult>(`files/${fileKey}/versions`),
+    getTeamProjects: (teamId: string) =>
+      api<GetTeamProjectsResult>(`teams/${teamId}/projects`),
+    getComponent: (key: string) => api<GetComponentResult>(`components/${key}`),
+    getComponentSet: (key: string) =>
+      api<GetComponentSetResult>(`component_sets/${key}`),
+    getFileComponents: () =>
+      api<GetFileComponentsResult>(`files/${fileKey}/components`),
+    getFileStyles: (file_key: string) =>
+      api<GetFileStylesResult>(`files/${file_key}/styles`),
+    getFile: (params: GetFileParams) =>
+      api<GetFileResult>(`files/${fileKey}`, { params }),
+    getFileNodes: (params: GetFileNodesParams) =>
+      api<GetFileNodesResult>(`files/${fileKey}/nodes`, { params }),
+    getImage: (params: GetImageParams) => {
       const ids = [...params.ids];
       const idsArray = [];
       while (ids.length > 0) {
@@ -47,7 +86,9 @@ export const createApi = (
       }
       const images = Promise.all(
         idsArray.map((ids) =>
-          api(`images/${fileKey}`, { params: { ...params, ids } }),
+          api<GetImageResult>(`images/${fileKey}`, {
+            params: { ...params, ids },
+          }),
         ),
       );
 
@@ -58,19 +99,27 @@ export const createApi = (
         return { images };
       });
     },
-    getProjectFiles: ({ project_id, ...params }) =>
-      api(`projects/${project_id}/files`, { params }),
-    getTeamComponents: ({ team_id, ...params }) =>
-      api(`teams/${team_id}/components`, { params }),
-    getTeamComponentSets: ({ team_id, ...params }) =>
-      api(`teams/${team_id}/component_sets`, { params }),
-    getFileComponentSets: () => api(`files/${fileKey}/component_sets`),
-    getTeamStyles: ({ team_id, ...params }) =>
-      api(`teams/${team_id}/styles`, { params }),
-    deleteComments: ({ commentId }) =>
-      api(`files/${fileKey}/comments/${commentId}`, { method: "DELETE" }),
-    postComments: (body) =>
-      api(`files/${fileKey}/comments`, {
+    getProjectFiles: ({ project_id, ...params }: GetProjectFilesParams) =>
+      api<GetProjectFilesResult>(`projects/${project_id}/files`, { params }),
+    getTeamComponents: ({ team_id, ...params }: GetTeamComponentsParams) =>
+      api<GetTeamComponentsResult>(`teams/${team_id}/components`, { params }),
+    getTeamComponentSets: ({
+      team_id,
+      ...params
+    }: GetTeamComponentSetsParams) =>
+      api<GetTeamComponentSetsResult>(`teams/${team_id}/component_sets`, {
+        params,
+      }),
+    getFileComponentSets: () =>
+      api<GetFileComponentSetsResult>(`files/${fileKey}/component_sets`),
+    getTeamStyles: ({ team_id, ...params }: GetTeamStylesParams) =>
+      api<GetTeamStylesResult>(`teams/${team_id}/styles`, { params }),
+    deleteComments: ({ commentId }: DeleteCommentsParams) =>
+      api<DeleteCommentsResult>(`files/${fileKey}/comments/${commentId}`, {
+        method: "DELETE",
+      }),
+    postComments: (body: PostCommentParams) =>
+      api<PostCommentResult>(`files/${fileKey}/comments`, {
         body: JSON.stringify(body),
         method: "POST",
         headers: { "Content-Type": "application/json" },

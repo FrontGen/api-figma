@@ -194,13 +194,6 @@ export interface GetFileResult {
 }
 
 export interface GetFileNodesParams {
-  /**
-   * File to export JSON from
-   *
-   * Can be found in url to file, eg:
-   * https://www.figma.com/file/FILE_KEY/FILE_NAME
-   */
-  fileKey: string;
   /** list of node IDs to retrieve and convert */
   ids: string[];
   /** A specific version ID to get. Omitting this will get the current version of the file */
@@ -420,48 +413,3 @@ export interface GetStyleResult {
   error?: boolean;
   meta?: StyleMetadata;
 }
-
-export type Api = {
-  // FIGMA FILES
-  // -----------------------------------------------------------------
-  getFile(params: GetFileParams): Promise<GetFileResult>;
-  getFileNodes(params: GetFileNodesParams): Promise<GetFileNodesResult>;
-  getImage(params: GetImageParams): Promise<GetImageResult>;
-  getImageFills(): Promise<GetImageFillsResult>;
-  // COMMENTS
-  // -----------------------------------------------------------------
-  getComments(): Promise<GetCommentsResult>;
-  postComments(params: PostCommentParams): Promise<PostCommentResult>;
-  deleteComments(params: DeleteCommentsParams): Promise<DeleteCommentsResult>;
-  // USERS
-  // -----------------------------------------------------------------
-  getUserMe(): Promise<GetUserMeResult>;
-  // VERSION HISTORY
-  // -----------------------------------------------------------------
-  getVersions(): Promise<GetVersionsResult>;
-  // PROJECTS
-  // -----------------------------------------------------------------
-  getTeamProjects(teamId: string): Promise<GetTeamProjectsResult>;
-  getProjectFiles(
-    params: GetProjectFilesParams,
-  ): Promise<GetProjectFilesResult>;
-  // COMPONENTS AND STYLES
-  // -----------------------------------------------------------------
-  /** Get a paginated list of published components within a team library */
-  getTeamComponents(
-    params: GetTeamComponentsParams,
-  ): Promise<GetTeamComponentsResult>;
-  getFileComponents(): Promise<GetFileComponentsResult>;
-  /** Get metadata on a component by key. The unique identifier of the component.*/
-  getComponent(key: string): Promise<GetComponentResult>;
-  getTeamComponentSets(
-    params: GetTeamComponentSetsParams,
-  ): Promise<GetTeamComponentSetsResult>;
-  getFileComponentSets(): Promise<GetFileComponentSetsResult>;
-  /** Key is unique identifier of the component_set */
-  getComponentSet(key: string): Promise<GetComponentSetResult>;
-  getTeamStyles(params: GetTeamStylesParams): Promise<GetTeamStylesResult>;
-  getFileStyles(fileKey: string): Promise<GetFileStylesResult>;
-  /** Key is unique identifier of the style */
-  getStyle(key: string): Promise<GetStyleResult>;
-};
